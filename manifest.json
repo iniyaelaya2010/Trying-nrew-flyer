@@ -1,0 +1,9 @@
+{
+  "name": "Delivery Tracking Web App",
+  "short_name": "DeliveryTracker",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#22c55e",
+  "icons": []
+}
