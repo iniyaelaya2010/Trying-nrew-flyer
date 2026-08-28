@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Delivery Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- LOGIN SCREEN -->
+    <section id="login-screen" class="screen active">
+      <h1>Delivery Tracking</h1>
+      <div class="portal-buttons">
+        <button id="employer-btn" class="primary-btn">Employer Portal</button>
+        <button id="carrier-btn" class="primary-btn">Carrier Portal</button>
+      </div>
+      <div id="passcode-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2 id="passcode-title">Enter Passcode</h2>
+          <input type="password" id="passcode-input" placeholder="Passcode" />
+          <div class="modal-actions">
+            <button id="passcode-submit" class="primary-btn">Enter</button>
+            <button id="passcode-cancel" class="secondary-btn">Cancel</button>
+          </div>
+          <p id="passcode-error" class="error-text"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMPLOYER PORTAL -->
+    <section id="employer-screen" class="screen">
+      <header class="top-bar">
+        <h2>Employer Dashboard (Read-only)</h2>
+        <button class="secondary-btn" id="employer-logout">Logout</button>
+      </header>
+      <main class="portal-main">
+        <div class="portal-column">
+          <h3>Delivery Status</h3>
+          <div id="employer-counts" class="status-counts">
+            <div><span>Pending:</span> <strong id="emp-count-pending">0</strong></div>
+            <div><span>Delivered:</span> <strong id="emp-count-delivered">0</strong></div>
+            <div><span>Revisit:</span> <strong id="emp-count-revisit">0</strong></div>
+          </div>
+          <ul id="employer-address-list" class="address-list"></ul>
+
+          <h3>Weekly Countdown</h3>
+          <div id="employer-timer">
+            <p id="emp-timer-text">Loading...</p>
+            <div class="progress-bar">
+              <div id="emp-timer-progress" class="progress-inner"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="portal-column">
+          <h3>Map & ETA</h3>
+          <div id="employer-map-container" class="map-container">
+            <iframe id="employer-map" class="map-iframe" loading="lazy"></iframe>
+          </div>
+          <p id="employer-eta">ETA: N/A | Distance: N/A</p>
+
+          <h3>AI Assistant (Read-only)</h3>
+          <div class="ai-chat">
+            <div id="employer-ai-messages" class="ai-messages"></div>
+            <div class="ai-input-row">
+              <input id="employer-ai-input" type="text" placeholder="Ask about deliveries..." />
+              <button id="employer-ai-send" class="primary-btn">Send</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <!-- CARRIER PORTAL -->
+    <section id="carrier-screen" class="screen">
+      <header class="top-bar">
+        <h2>Carrier Dashboard (Full Access)</h2>
+        <button class="secondary-btn" id="carrier-logout">Logout</button>
+      </header>
+      <nav class="sub-nav">
+        <button class="sub-nav-btn active" data-view="carrier-main-view">Deliveries</button>
+        <button class="sub-nav-btn" data-view="carrier-history-view">History</button>
+        <button class="sub-nav-btn" data-view="carrier-stats-view">Stats</button>
+        <button class="sub-nav-btn" data-view="carrier-settings-view">Settings</button>
+      </nav>
+
+      <main class="portal-main">
+        <!-- MAIN DELIVERY VIEW -->
+        <div id="carrier-main-view" class="portal-view active">
+          <div class="portal-column">
+            <h3>Users</h3>
+            <div class="inline-row">
+              <input id="carrier-user-name" type="text" placeholder="New user name" />
+              <select id="carrier-user-role">
+                <option value="carrier">Carrier</option>
+                <option value="employer">Employer</option>
+              </select>
+              <button id="carrier-add-user" class="primary-btn">Add</button>
+            </div>
+            <ul id="carrier-user-list" class="user-list"></ul>
+
+            <h3>Addresses</h3>
+            <div class="address-inputs">
+              <textarea id="carrier-address-text" placeholder="Type address here"></textarea>
+              <div class="inline-row">
+                <input id="carrier-address-lat" type="text" placeholder="Latitude" />
+                <input id="carrier-address-lng" type="text" placeholder="Longitude" />
+              </div>
+              <button id="carrier-add-address" class="primary-btn">Add Address</button>
+            </div>
+
+            <div class="import-section">
+              <h4>Import by Image</h4>
+              <input type="file" id="carrier-image-input" accept="image/*" />
+              <button id="carrier-image-import" class="secondary-btn">Extract & Clean</button>
+
+              <h4>Import by Voice</h4>
+              <button id="carrier-voice-start" class="primary-btn">Start Voice</button>
+              <p id="carrier-voice-output"></p>
+            </div>
+
+            <h3>Delivery List</h3>
+            <div id="carrier-counts" class="status-counts">
+              <div><span>Pending:</span> <strong id="car-count-pending">0</strong></div>
+              <div><span>Delivered:</span> <strong id="car-count-delivered">0</strong></div>
+              <div><span>Revisit:</span> <strong id="car-count-revisit">0</strong></div>
+            </div>
+            <ul id="carrier-address-list" class="address-list"></ul>
+
+            <h3>Weekly Countdown</h3>
+            <div id="carrier-timer">
+              <p id="car-timer-text">Loading...</p>
+              <div class="progress-bar">
+                <div id="car-timer-progress" class="progress-inner"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="portal-column">
+            <h3>Current Address & Map</h3>
+            <div id="carrier-current-address" class="current-address">No address selected</div>
+            <div class="inline-row">
+              <button id="carrier-next-btn" class="primary-btn">NEXT</button>
+            </div>
+            <div id="carrier-map-container" class="map-container">
+              <iframe id="carrier-map" class="map-iframe" loading="lazy"></iframe>
+            </div>
+            <p id="carrier-eta">ETA: N/A | Distance: N/A</p>
+
+            <div class="inline-row">
+              <button id="carrier-mark-delivered" class="primary-btn">Delivered</button>
+              <button id="carrier-mark-revisit" class="secondary-btn">Revisit</button>
+            </div>
+
+            <h3>AI Assistant</h3>
+            <div class="ai-chat">
+              <div id="carrier-ai-messages" class="ai-messages"></div>
+              <div class="ai-input-row">
+                <input id="carrier-ai-input" type="text" placeholder="Ask AI for help..." />
+                <button id="carrier-ai-send" class="primary-btn">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORY VIEW -->
+        <div id="carrier-history-view" class="portal-view">
+          <h3>Full History</h3>
+          <ul id="carrier-history-list" class="history-list"></ul>
+        </div>
+
+        <!-- STATS VIEW -->
+        <div id="carrier-stats-view" class="portal-view">
+          <h3>Statistics</h3>
+          <div id="carrier-stats-content"></div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div id="carrier-settings-view" class="portal-view">
+          <h3>Settings</h3>
+          <div class="settings-section">
+            <h4>Import Addresses (CSV or text)</h4>
+            <textarea id="settings-import-text" placeholder="Paste CSV or text addresses here"></textarea>
+            <button id="settings-import-btn" class="primary-btn">Import</button>
+          </div>
+
+          <div class="settings-section">
+            <h4>Export History (CSV)</h4>
+            <button id="settings-export-history" class="secondary-btn">Download CSV</button>
+          </div>
+
+          <div class="settings-section">
+            <h4>Backup & Restore (JSON)</h4>
+            <button id="settings-backup" class="secondary-btn">Download Backup</button>
+            <input type="file" id="settings-restore-file" accept="application/json" />
+            <button id="settings-restore" class="primary-btn">Restore</button>
+          </div>
+
+          <div class="settings-section">
+            <h4>Delete All Data</h4>
+            <button id="settings-delete-all" class="danger-btn">Delete Everything</button>
+          </div>
+        </div>
+      </main>
+    </section>
+  </div>
+
+  <script src="db.js"></script>
+  <script src="data.js"></script>
+  <script src="map.js"></script>
+  <script src="timer.js"></script>
+  <script src="ai.js"></script>
+  <script src="voice.js"></script>
+  <script src="image.js"></script>
+  <script src="next.js"></script>
+  <script src="history.js"></script>
+  <script src="stats.js"></script>
+  <script src="settings.js"></script>
+  <script src="login.js"></script>
+  <script src="carrier.js"></script>
+  <script src="employer.js"></script>
+  <script src="service-worker.js"></script>
+</body>
+</html>
